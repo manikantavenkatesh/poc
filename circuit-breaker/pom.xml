@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.servicenow.it</groupId>
+    <artifactId>mule-module-circuitbreaker</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>mule-module</packaging>
+    <name>CircuitBreaker Connector</name>
+
+    <parent>
+        <groupId>org.mule.tools.devkit</groupId>
+        <artifactId>mule-devkit-parent</artifactId>
+        <version>3.8.2</version>
+    </parent>
+
+    <properties>
+        <category>Community</category>
+        <licensePath>LICENSE.md</licensePath>
+        <devkit.studio.package.skip>false</devkit.studio.package.skip>
+    </properties>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>com.mulesoft.munit.tools</groupId>
+                <artifactId>munit-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <testResources>
+            <testResource>
+                <directory>src/test/munit</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+
+    </build>
+
+    <repositories>
+        <repository>
+            <id>dev</id>
+            <url>https://artifact.devsnc.com/content/groups/dev</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <!--  specified in minutes: 4 hours  -->
+                <updatePolicy>interval:240</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>stable</id>
+            <url>https://artifact.devsnc.com/content/groups/stable</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+  
+    <pluginRepositories>
+        <pluginRepository>
+            <id>dev</id>
+            <name>SNC Development</name>
+            <url>http://nexus.proxy.devsnc.com/content/groups/dev</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <!-- specified in minutes: 4 hours -->
+                <updatePolicy>interval:240</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>stable</id>
+            <name>SNC Stable</name>
+            <url>http://nexus.proxy.devsnc.com/content/groups/stable</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+  
+    <distributionManagement>
+        <repository>
+            <id>devsnc-releases</id>
+            <name>devsnc-releases</name>
+            <url>https://artifact.devsnc.com/content/repositories/dev-snc-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>devsnc-snapshots</id>
+            <name>devsnc-snapshots</name>
+            <url>https://artifact.devsnc.com/content/repositories/dev-snc-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.mulesoft.munit</groupId>
+            <artifactId>mule-munit-support</artifactId>
+            <version>3.7.3-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mulesoft.munit</groupId>
+            <artifactId>munit-runner</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+</project>
