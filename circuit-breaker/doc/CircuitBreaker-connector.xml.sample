@@ -1,0 +1,3 @@
+<!-- BEGIN_INCLUDE(circuitbreaker:breaker) -->
+    <circuitbreaker:breaker tripOnException="org.mule.*" />
+<!-- END_INCLUDE(circuitbreaker:breaker) -->

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:mock="http://www.mulesoft.org/schema/mule/mock"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:circuitbreaker="http://www.mulesoft.org/schema/mule/circuitbreaker"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/mock http://www.mulesoft.org/schema/mule/mock/current/mule-mock.xsd
+          http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+          http://www.mulesoft.org/schema/mule/circuitbreaker http://www.mulesoft.org/schema/mule/circuitbreaker/current/mule-circuitbreaker.xsd
+          http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+      ">
+
+    <munit:config name="breakertest-munit-config"/>
+    <mock:config name="breakertest-mock-config"/>
+
+    <circuitbreaker:config breakerName="MyBreaker" name="breaker" tripThreshold="2" tripTimeout="10000"/>
+
+    <munit:test name="breakerTest" description="TestCircuitBreaker">
+        <flow-ref name="FailingFlow"/>
+        <logger level="INFO" message="Failed once"/>
+        <munit:assert-payload-equals expectedValue="#['HELLO']"/>
+        <flow-ref name="FailingFlow"/>
+        <munit:assert-payload-equals expectedValue="#['BYE']"/>
+        <expression-component>
+            Thread.sleep(15000);
+        </expression-component>
+        <flow-ref name="FailingFlow"/>
+        <!--<logger level="INFO" message="Failed once"/>-->
+        <munit:assert-payload-equals expectedValue="#['HELLO']"/>
+    </munit:test>
+
+    <flow name="FailingFlow">
+        <logger level="INFO" message="Before CB"/>
+        <!--<circuitbreaker:breaker config-ref="breaker" tripOnException="^.*BrokenBarrier.*$" />-->
+        <circuitbreaker:breaker config-ref="breaker" tripOnException="java.util.concurrent.BrokenBarrierException" />
+        <logger level="INFO" message="After CB"/>
+        <logger level="INFO" message="Before Exception"/>
+        <test:component throwException="true" exceptionToThrow="java.util.concurrent.BrokenBarrierException"/>
+        <logger level="INFO" message="After Exception"/>
+        <catch-exception-strategy>
+            <choice>
+                <when expression="#[org.apache.commons.lang.exception.ExceptionUtils.getRootCause(exception) is java.util.concurrent.BrokenBarrierException]">
+                    <logger level="INFO" message="BROKEN BARRIER"/>
+                    <set-payload value="HELLO"/>
+                </when>
+                <when expression="#[org.apache.commons.lang.exception.ExceptionUtils.getRootCause(exception) is com.servicenow.it.circuitbreaker.CircuitOpenException]">
+                    <logger level="INFO" message="CIRCUIT OPEN"/>
+                    <set-payload value="BYE"/>
+                </when>
+            </choice>
+        </catch-exception-strategy>
+    </flow>
+</mule>
